@@ -29,7 +29,8 @@
     "build:doc": "jsdoc2md --files src/**/*.ts --configure ./jsdoc2md.json > ./API.md",
     "version": "node hooks/prepublish.js && git add midi-script/Internal.py && auto-changelog -p -l 100 && git add CHANGELOG.md",
     "build": "tsc",
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "prepare": "tsc"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
