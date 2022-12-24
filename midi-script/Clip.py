@@ -26,6 +26,18 @@ class Clip(Interface):
     def get_available_warp_modes(self, ns):
         return list(ns.available_warp_modes)
 
+    def get_notes(self, ns, from_time=0, from_pitch=0, time_span=99999999999999, pitch_span=128):
+        return ns.get_notes(from_time, from_pitch, time_span, pitch_span)
+
+    def get_warp_markers(self, ns):
+        dict_markers = []
+        for warp_marker in ns.warp_markers:
+            dict_markers.append({
+                "beat_time": warp_marker.beat_time,
+                "sample_time": warp_marker.sample_time,
+            })
+        return dict_markers
+
     def set_notes(self, ns, notes):
         return ns.set_notes(tuple(notes))
 

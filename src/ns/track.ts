@@ -143,7 +143,7 @@ export interface ObservableProperties {
 }
 
 export interface RawTrack {
-  id: number;
+  id: string;
   name: string;
   color: number;
   is_foldable: boolean;
@@ -167,12 +167,22 @@ export class Track extends Namespace<
       clip_slots: (clip_slots) =>
         clip_slots.map((c) => new ClipSlot(ableton, c)),
     };
+
+    this.cachedProps = {
+      arrangement_clips: true,
+      devices: true,
+      clip_slots: true,
+    };
   }
 
-  duplicateClipToArrangement(clipID: number, time: number) {
+  /**
+   * Duplicates the given clip into the arrangement of this track at the provided destination time and returns it.
+   * When the type of the clip and the type of the track are incompatible, a runtime error is raised.
+   */
+  duplicateClipToArrangement(clipOrId: Clip | number, time: number) {
     return this.sendCommand("duplicate_clip_to_arrangement", {
-      clip_id: clipID,
-      time: time
+      clip_id: typeof clipOrId === "number" ? clipOrId : clipOrId.raw.id,
+      time: time,
     });
   }
 }

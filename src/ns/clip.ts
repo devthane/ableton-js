@@ -38,6 +38,11 @@ export enum LaunchQuantization {
   QThirtySecond = 14,
 }
 
+interface WarpMarker {
+  beat_time: number;
+  sample_time: number;
+}
+
 export interface GettableProperties {
   available_warp_modes: WarpMode[];
   color: number;
@@ -77,12 +82,14 @@ export interface GettableProperties {
   velocity_amount: number;
   //view: unknown;
   warp_mode: WarpMode;
+  warp_markers: WarpMarker[]; // Only supported in ableton 11
   warping: boolean;
   will_record_on_start: boolean;
 }
 
 export interface TransformedProperties {
   color: Color;
+  notes: Note[];
   selected_notes: Note[];
 }
 
@@ -125,6 +132,7 @@ export interface ObservableProperties {
   loop_start: number;
   muted: boolean;
   name: string;
+  notes: NoteTuple[];
   pitch_coarse: number;
   pitch_fine: number;
   playing_position: number;
@@ -137,7 +145,7 @@ export interface ObservableProperties {
 }
 
 export interface RawClip {
-  id: number;
+  id: string;
   name: string;
   color: number;
   is_audio_clip: boolean;
@@ -161,6 +169,7 @@ export class Clip extends Namespace<
 
     this.transformers = {
       color: (c) => new Color(c),
+      notes: (n) => (n as NoteTuple[]).map(tupleToNote),
       selected_notes: (n) => n.map(tupleToNote),
     };
   }
@@ -259,12 +268,12 @@ export class Clip extends Namespace<
     timeSpan: number,
     pitchSpan: number,
   ): Promise<Note[]> {
-    const notes: NoteTuple[] = await this.sendCommand("get_notes", [
-      fromTime,
-      fromPitch,
-      timeSpan,
-      pitchSpan,
-    ]);
+    const notes: NoteTuple[] = await this.sendCommand("get_notes", {
+      from_time: fromTime,
+      from_pitch: fromPitch,
+      time_span: timeSpan,
+      pitch_span: pitchSpan,
+    });
 
     return notes.map(tupleToNote);
   }
